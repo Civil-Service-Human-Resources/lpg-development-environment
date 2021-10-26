@@ -1,5 +1,5 @@
-from script_helpers.config import APPS, APP_DIR
-from script_helpers.git_functions import create_dirs, clone_all_apps
+from script_helpers.config import APPS
+from script_helpers.git_functions import clone_all_apps, create_required_directories
 from script_helpers.app_functions import build_apps
 
 
@@ -24,8 +24,7 @@ def run():
     requirements_met = check_requirements()
 
     if requirements_met:
-        dirs = [APP_DIR]
-        create_dirs(dirs)
+        create_required_directories()
 
         print("\nCLONING APPS\n")
         clone_all_apps(APPS)
