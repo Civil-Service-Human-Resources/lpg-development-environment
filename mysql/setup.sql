@@ -1,0 +1,3 @@
+CREATE SCHEMA `csrs` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ;
+CREATE SCHEMA `identity` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ;
+CREATE SCHEMA `learner_record` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ;

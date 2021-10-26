@@ -1,0 +1,214 @@
+version: '2.4'
+services:
+
+  # frontend
+  lpg-management:
+    # container_name: lpg-management
+    env_file:
+      - ./env/lpg-management.env
+    depends_on: 
+      - identity
+      - redis
+      - learning-catalogue
+      - civil-servant-registry
+      - report-service
+    build: 
+      context: apps/lpg-management
+    command: npm start
+    ports:
+      - 3005:3005
+
+  lpg-services:
+    # container_name: lpg-services
+    env_file:
+      - ./env/lpg-services.env
+    depends_on: 
+      - identity
+      - civil-servant-registry
+      - redis
+      - lpg-management
+      - learner-record
+      - learning-catalogue
+    build:
+      context: apps/lpg-services
+    command: npm run start:ui
+    ports:
+      - 3001:3001
+
+  identity-management:
+    # container_name: identity-management
+    env_file:
+      - ./env/identity-management.env
+    depends_on: 
+      - mysql
+      - identity
+      - learner-record
+      - civil-servant-registry
+      - notification-service
+    build:
+      context: apps/identity-management
+    ports:
+      - 8081:8081
+      - 8000:8000
+    command: java -jar /data/app.jar
+
+  # CSHR
+  identity:
+    # container_name: identity
+    env_file:
+      - ./env/identity.env
+    depends_on: 
+      - mysql
+      - civil-servant-registry
+    build:
+      context: apps/identity-service
+    ports:
+      - 8080:8080
+
+  learner-record:
+    # container_name: learner-record
+    env_file:
+      - ./env/learner-record.env  
+    build:
+      context: apps/lpg-learner-record
+    depends_on:
+      - civil-servant-registry
+      - identity
+      - learning-catalogue
+      - mongodb
+      - mysql
+      - learning-locker-xapi
+    ports:
+      - 9000:9000
+
+  learning-catalogue:
+    # container_name: learning-catalogue
+    env_file:
+      - ./env/learning-catalogue.env
+    command:
+      [
+        'java',
+        '-jar',
+        '/data/app.jar',
+      ]
+    build: 
+      context: apps/lpg-learning-catalogue
+    depends_on:
+      - identity
+      - elasticsearch
+    ports:
+      - 9001:9001
+
+  civil-servant-registry:
+    # container_name: civil-servant-registry
+    env_file:
+      - ./env/civil-servant-registry.env
+    build:
+      context: apps/civil-servant-registry-service
+    depends_on: 
+      - mysql
+    ports:
+      - 9002:9002
+
+  report-service:
+    # container_name: report-service
+    env_file:
+      - ./env/report-service.env
+    build:
+      context: apps/lpg-report-service
+    depends_on:
+      - identity
+      - learner-record
+    ports:
+      - 9004:9004
+
+  notification-service:
+    # container_name: notification-service
+    env_file:
+      - ./env/notification-service.env
+    build: 
+      context: apps/notification-service
+    depends_on:
+      - identity
+    ports:
+      - 9005:9005
+  # /CSHR
+
+  learning-locker-api-worker:
+    command: ['node', '/opt/learning-locker/worker/dist/server']
+    # container_name: learning-locker-api-worker
+    image: lpgregistry.azurecr.io/lpg-learning-locker:fe8104bf2f0fedb8f5af138bd8860a9c27dd2bb12ecb827f09e754e279a70fa8
+    working_dir: /opt/learning-locker
+
+  learning-locker-ui:
+    command: ['/opt/learning-locker/run-ui.sh']
+    # container_name: learning-locker-ui
+    image: lpgregistry.azurecr.io/lpg-learning-locker:fe8104bf2f0fedb8f5af138bd8860a9c27dd2bb12ecb827f09e754e279a70fa8
+    ports:
+      - 3000:3000
+    working_dir: /opt/learning-locker
+
+  learning-locker-xapi:
+    # command: ['node', '/opt/xapi-service/dist/server']
+    command: ['npm', 'start']
+    # container_name: learning-locker-xapi
+    depends_on:
+      - mongodb
+      - redis
+      - learning-locker-api-worker
+    image: lpgregistry.azurecr.io/lpg-learning-locker:fe8104bf2f0fedb8f5af138bd8860a9c27dd2bb12ecb827f09e754e279a70fa8
+    ports:
+      - 8083:8083
+    working_dir: /opt/xapi-service
+
+  setup-learning-locker:
+    command:
+      [
+        '/opt/learning-locker/./node_modules/.bin/babel-node',
+        '/opt/learning-locker/mkadmin.js',
+      ]
+    depends_on:
+      - mongodb
+    environment:
+      - NODE_PATH=/opt/learning-locker
+    image: lpgregistry.azurecr.io/lpg-learning-locker:fe8104bf2f0fedb8f5af138bd8860a9c27dd2bb12ecb827f09e754e279a70fa8
+    working_dir: /opt/learning-locker
+  # /Learning Locker
+
+  # # Data
+  elasticsearch:
+    # container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
+    ports:
+      - 9200:9200
+      - 9300:9300
+    command: 'elasticsearch -E cluster.name=local -E discovery.type=single-node'
+
+  mongodb:
+    # container_name: mongodb
+    image: mongo@sha256:fbb95eaa5a0c84d0d2098775f166003c568a79f993d91309cee7cda4135bbbfd
+    ports:
+      - 27017:27017
+
+  redis:
+    # container_name: redis
+    image: redis@sha256:3446883dfe13ab3db67433aace0e72d8cd669c528e60c617c42d6c697f0fa41f
+    ports:
+      - 6379:6379
+  
+  mysql:
+    # container_name: mysql
+    image: mysql:5.7.28
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./mysql:/tmp/database
+    ports:
+      - 3306:3306
+    command: mysqld --init-file="/tmp/database/setup.sql"
+    environment: 
+      - MYSQL_ROOT_PASSWORD=my-secret-pw
+
+   #/Data
+
+volumes:
+  dbdata:
