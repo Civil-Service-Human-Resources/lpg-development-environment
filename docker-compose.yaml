@@ -34,6 +34,7 @@ services:
     command: npm run start:ui
     ports:
       - 3001:3001
+      - 9229:9229
 
   identity-management:
     # container_name: identity-management
