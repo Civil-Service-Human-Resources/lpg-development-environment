@@ -40,6 +40,8 @@ The script will then loop through the applications it has cloned and attempt to 
 
 After all of the repositories have been cloned/built, the initial `docker-compose up` can be executed. **The docker-compose file included in this project is intended for use with the `Dockerfile.dev` Dockerfiles in each app. A different `docker-compose.yaml` is required to make use of the standard `Dockerfile`.**
 
+The `-d` flag can be added to run the up as a daemon command.
+
 #### Java applications
 
 The `idt-feature-LC-XXX-local-development` **must** be used for the initial `docker-compose up` command, as it contains the missing SQL in the migration files for the Java applications. If the regular branches are used first, the springboot applications will fail to apply to migrations (as the files in the regular branches contain invalid SQL). If the springboot apps fail to start for this reason, the migration table will need to be reset as well.
@@ -49,6 +51,10 @@ The `idt-feature-LC-XXX-local-development` **must** be used for the initial `doc
 The main difference between the regular branches and `idt-feature-LC-XXX-local-development` branch for the NodeJS applications are the correction of the endpoints to the `develop.learn.civilservice.gov.uk` domain. **However**, these endpoints are overidden within the environment variables for the dev-env project regardless.
 
 There is also an IntelliJ run configuration in the `idt-feature-LC-XXX-local-development` branch which can be used to conveniently attach to the running Node process in Google Chrome.
+
+### Learning Catalogue
+
+The learning catalogue application will not start correctly unless Elasticsearch is **fully** up. There is a `wait-for-it.sh` but sometimes even this doesn't catch the timing correctly. If learning catalogue fails to start, simply run `docker-compose restart learning-catalogue`
 
 #### Learning Locker
 
