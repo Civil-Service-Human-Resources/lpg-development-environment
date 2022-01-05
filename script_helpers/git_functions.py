@@ -28,6 +28,10 @@ def check_and_create_dir(directory):
         os.mkdir(directory)
 
 
+def create_required_directories():
+    dirs = [APP_DIR]
+    create_dirs(dirs)
+
 def does_app_repo_exist(app: App):
     return os.path.exists(f"{APP_DIR}/{app.name}")
 

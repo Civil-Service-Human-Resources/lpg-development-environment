@@ -1,4 +1,4 @@
-version: '2.4'
+version: '3.9'
 services:
 
   # frontend
@@ -34,6 +34,7 @@ services:
     command: npm run start:ui
     ports:
       - 3001:3001
+      - 9229:9229
 
   identity-management:
     # container_name: identity-management
@@ -49,12 +50,10 @@ services:
       context: apps/identity-management
     ports:
       - 8081:8081
-      - 8000:8000
     command: java -jar /data/app.jar
 
   # CSHR
   identity:
-    # container_name: identity
     env_file:
       - ./env/identity.env
     depends_on: 
@@ -62,8 +61,11 @@ services:
       - civil-servant-registry
     build:
       context: apps/identity-service
+      dockerfile: Dockerfile.dev
+      target: develop
     ports:
       - 8080:8080
+      - 8090:8090
 
   learner-record:
     # container_name: learner-record
@@ -71,6 +73,8 @@ services:
       - ./env/learner-record.env  
     build:
       context: apps/lpg-learner-record
+      dockerfile: Dockerfile.dev
+      target: develop
     depends_on:
       - civil-servant-registry
       - identity
@@ -80,24 +84,22 @@ services:
       - learning-locker-xapi
     ports:
       - 9000:9000
+      - 9010:9010
 
   learning-catalogue:
     # container_name: learning-catalogue
     env_file:
       - ./env/learning-catalogue.env
-    command:
-      [
-        'java',
-        '-jar',
-        '/data/app.jar',
-      ]
     build: 
       context: apps/lpg-learning-catalogue
+      dockerfile: Dockerfile.dev
+      target: develop
     depends_on:
       - identity
       - elasticsearch
     ports:
       - 9001:9001
+      - 9091:9091
 
   civil-servant-registry:
     # container_name: civil-servant-registry
@@ -105,10 +107,13 @@ services:
       - ./env/civil-servant-registry.env
     build:
       context: apps/civil-servant-registry-service
+      dockerfile: Dockerfile.dev
+      target: develop
     depends_on: 
       - mysql
     ports:
       - 9002:9002
+      - 9012:9012
 
   report-service:
     # container_name: report-service
@@ -116,11 +121,14 @@ services:
       - ./env/report-service.env
     build:
       context: apps/lpg-report-service
+      dockerfile: Dockerfile.dev
+      target: develop
     depends_on:
       - identity
       - learner-record
     ports:
       - 9004:9004
+      - 9014:9014
 
   notification-service:
     # container_name: notification-service
@@ -128,10 +136,13 @@ services:
       - ./env/notification-service.env
     build: 
       context: apps/notification-service
+      dockerfile: Dockerfile.dev
+      target: develop
     depends_on:
       - identity
     ports:
       - 9005:9005
+      - 9015:9015
   # /CSHR
 
   learning-locker-api-worker:

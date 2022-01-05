@@ -1,0 +1,4 @@
+127.0.0.1   develop.learn.civilservice.gov.uk
+127.0.0.1   management.develop.learn.civilservice.gov.uk
+127.0.0.1   identity.develop.learn.civilservice.gov.uk
+127.0.0.1   identity
