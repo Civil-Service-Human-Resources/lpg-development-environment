@@ -10,6 +10,15 @@ It is designed to work with the `idt-feature-LC-XXX-local-development` branch on
 
 - There is a **hard requirement** to put the relevant host entries in your hosts file before accessing the site locally. This is because Docker-compose networking is used for the frontend applications. The required hosts can be found in `supporting_files/required_hosts.txt`.
 
+### On a Mac
+
+On a Mac, open the Terminal, head to the root of this repository and paste the following command to update the hosts:
+
+```sh
+sudo zsh -c "cat supporting_files/required_hosts.txt >> /etc/hosts"
+```
+(This will most probably ask for your password as it's a `sudo` command).
+
 ## build_dev_env.py
 
 This is the main entry point for the development environment. This script will clone all of the relevant projects and checkout to the relevant branches. It will also build JARs/JS projects, if desired, however this is not necessary to running the development environment (It is necessary if you want to use the base `Dockerfile` for each project).
