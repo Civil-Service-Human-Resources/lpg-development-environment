@@ -8,9 +8,21 @@ It is designed to work with the `idt-feature-LC-XXX-local-development` branch on
 
 ## Requirements
 
+### Azure account
+
+An Azure account is needed to be provided by the Apps Team.
+
+Once you have an account, you'll need to authorise Azure. To do this:
+
+1. [Install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) for your OS. This may take a few minutes.
+
+2. In your terminal, run `az acr login --name lpgregistry`. This will log you in to the LPG Azure registry by opening a page in the browser.
+
+### Host entries
+
 - There is a **hard requirement** to put the relevant host entries in your hosts file before accessing the site locally. This is because Docker-compose networking is used for the frontend applications. The required hosts can be found in `supporting_files/required_hosts.txt`.
 
-### On a Mac
+#### On a Mac
 
 On a Mac, open the Terminal, head to the root of this repository and paste the following command to update the hosts:
 
