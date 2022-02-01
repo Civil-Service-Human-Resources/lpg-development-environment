@@ -141,7 +141,7 @@ services:
     depends_on:
       - identity
     ports:
-      - 9005:9005
+      - 9006:9006
       - 9015:9015
   # /CSHR
 
