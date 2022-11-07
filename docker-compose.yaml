@@ -81,7 +81,6 @@ services:
       - learning-catalogue
       - mongodb
       - mysql
-      - learning-locker-xapi
     ports:
       - 9000:9000
       - 9010:9010
@@ -145,47 +144,6 @@ services:
       - 9015:9015
   # /CSHR
 
-  learning-locker-api-worker:
-    command: ['node', '/opt/learning-locker/worker/dist/server']
-    # container_name: learning-locker-api-worker
-    image: lpgregistry.azurecr.io/lpg-learning-locker:fe8104bf2f0fedb8f5af138bd8860a9c27dd2bb12ecb827f09e754e279a70fa8
-    working_dir: /opt/learning-locker
-
-  learning-locker-ui:
-    command: ['/opt/learning-locker/run-ui.sh']
-    # container_name: learning-locker-ui
-    image: lpgregistry.azurecr.io/lpg-learning-locker:fe8104bf2f0fedb8f5af138bd8860a9c27dd2bb12ecb827f09e754e279a70fa8
-    ports:
-      - 3000:3000
-    working_dir: /opt/learning-locker
-
-  learning-locker-xapi:
-    # command: ['node', '/opt/xapi-service/dist/server']
-    command: ['npm', 'start']
-    # container_name: learning-locker-xapi
-    depends_on:
-      - mongodb
-      - redis
-      - learning-locker-api-worker
-    image: lpgregistry.azurecr.io/lpg-learning-locker:fe8104bf2f0fedb8f5af138bd8860a9c27dd2bb12ecb827f09e754e279a70fa8
-    ports:
-      - 8083:8083
-    working_dir: /opt/xapi-service
-
-  setup-learning-locker:
-    command:
-      [
-        '/opt/learning-locker/./node_modules/.bin/babel-node',
-        '/opt/learning-locker/mkadmin.js',
-      ]
-    depends_on:
-      - mongodb
-    environment:
-      - NODE_PATH=/opt/learning-locker
-    image: lpgregistry.azurecr.io/lpg-learning-locker:fe8104bf2f0fedb8f5af138bd8860a9c27dd2bb12ecb827f09e754e279a70fa8
-    working_dir: /opt/learning-locker
-  # /Learning Locker
-
   # # Data
   elasticsearch:
     # container_name: elasticsearch
@@ -194,12 +152,6 @@ services:
       - 9200:9200
       - 9300:9300
     command: 'elasticsearch -E cluster.name=local -E discovery.type=single-node'
-
-  mongodb:
-    # container_name: mongodb
-    image: mongo@sha256:fbb95eaa5a0c84d0d2098775f166003c568a79f993d91309cee7cda4135bbbfd
-    ports:
-      - 27017:27017
 
   redis:
     # container_name: redis
