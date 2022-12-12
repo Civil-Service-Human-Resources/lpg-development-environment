@@ -22,14 +22,14 @@ def check_requirements():
     return match
 
 
-def run(build_apps=False):
+def run(should_build_apps=False):
 
     create_required_directories()
 
     print("\nCLONING APPS\n")
     clone_all_apps(APPS)
 
-    if build_apps:
+    if should_build_apps:
         requirements_met = check_requirements()
         if requirements_met:
             print("\nBUILDING APPS\n")
@@ -56,4 +56,4 @@ if invalid_args:
     exit(1)
 
 should_build_apps = BUILD_APPS_FLAG in args
-run(build_apps=should_build_apps)
+run(should_build_apps=should_build_apps)
