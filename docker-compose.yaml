@@ -81,7 +81,6 @@ services:
       - learning-catalogue
       - mongodb
       - mysql
-      - learning-locker-xapi
     ports:
       - 9000:9000
       - 9010:9010

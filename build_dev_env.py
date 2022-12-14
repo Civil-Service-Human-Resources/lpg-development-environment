@@ -54,6 +54,5 @@ invalid_args = validate_args(args)
 if invalid_args:
     print(f"{invalid_args} are not valid arguments. Valid args are: {ACCEPTED_ARGS}")
     exit(1)
-
 should_build_apps = BUILD_APPS_FLAG in args
 run(should_build_apps=should_build_apps)
