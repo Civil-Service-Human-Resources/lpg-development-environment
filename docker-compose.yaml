@@ -58,7 +58,7 @@ services:
       - ./env/identity.env
     depends_on: 
       - mysql
-      - civil-servant-registry
+      # - civil-servant-registry
     build:
       context: apps/identity-service
       dockerfile: Dockerfile.dev
@@ -76,15 +76,15 @@ services:
       dockerfile: Dockerfile.dev
       target: develop
     depends_on:
-      - civil-servant-registry
+      # - civil-servant-registry
       - identity
-      - learning-catalogue
-      - mongodb
+      # - learning-catalogue
       - mysql
-      - learning-locker-xapi
     ports:
       - 9000:9000
       - 9010:9010
+    volumes:
+      - /apps/lpg-learner-record/src:/workspace/app/src
 
   learning-catalogue:
     # container_name: learning-catalogue
@@ -111,6 +111,7 @@ services:
       target: develop
     depends_on: 
       - mysql
+      - identity
     ports:
       - 9002:9002
       - 9012:9012
@@ -145,10 +146,29 @@ services:
       - 9015:9015
   # /CSHR
 
+  rustici-engine:
+    networks:
+      - network
+    image: lpgregistry.azurecr.io/rustici-engine/test:idt-develop
+    env_file:
+      - ./env/rustici-engine.env
+    depends_on:
+      - rustici_mysql
+      - azurite
+      - nginx
+      # - csl-service
+    ports:
+      - 3000:8080
+    # volumes:
+    #   - ./config/RusticiEngineSettings.properties:/usr/local/tomcat/lib/RusticiEngineSettings.properties
+
   # # Data
   elasticsearch:
     # container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.4.3
+    environment:
+    - network.bind_host=0.0.0.0
+    - xpack.security.enabled=false
     ports:
       - 9200:9200
       - 9300:9300
@@ -159,7 +179,26 @@ services:
     image: redis@sha256:3446883dfe13ab3db67433aace0e72d8cd669c528e60c617c42d6c697f0fa41f
     ports:
       - 6379:6379
-  
+
+  azurite:
+    networks:
+      - network
+    depends_on:
+      - nginx
+    image: mcr.microsoft.com/azure-storage/azurite
+    command: "azurite --loose --blobHost 0.0.0.0 --blobPort 9100 --queueHost 0.0.0.0 --location /workspace --debug /workspace/debug.log"
+    ports:
+      - 9100:9100
+
+  setup-azurite:
+    networks:
+      - network
+    depends_on:
+      - azurite
+    build: 
+      context: ./setup_azure_storage
+      dockerfile: Dockerfile
+
   mysql:
     # container_name: mysql
     image: mysql:5.7.28
@@ -172,7 +211,39 @@ services:
     environment: 
       - MYSQL_ROOT_PASSWORD=my-secret-pw
 
+  rustici_mysql:
+    # container_name: mysql
+    networks:
+      - network
+    image: mysql:8.0
+    volumes:
+      - rustici_dbdata:/var/lib/mysql
+      - ./mysql:/tmp/database
+    ports:
+      - 3307:3306
+    command: mysqld --init-file="/tmp/database/rustici_setup.sql"
+    environment: 
+      - MYSQL_ROOT_PASSWORD=my-secret-pw
+
+  nginx:
+    container_name: nginx
+    networks:
+        network:
+          aliases:
+            - csl.local
+    image: nginx:stable-alpine
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+
    #/Data
 
 volumes:
   dbdata:
+  rustici_dbdata:
+
+networks:
+  network:
+    name: network

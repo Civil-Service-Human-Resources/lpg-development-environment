@@ -38,6 +38,7 @@ def run(should_build_apps=False):
             print("ERROR: Build flag was passed in, however not all requirements for building projects have been met.")
             exit(1)
 
+
 def validate_args(args):
 
     invalid_args = []
