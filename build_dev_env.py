@@ -57,4 +57,4 @@ if invalid_args:
     exit(1)
 
 should_build_apps = BUILD_APPS_FLAG in args
-run(build_apps=should_build_apps)
+run(should_build_apps=should_build_apps)
