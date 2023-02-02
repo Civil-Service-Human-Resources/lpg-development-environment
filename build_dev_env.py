@@ -1,6 +1,7 @@
 from script_helpers.config import APPS
 from script_helpers.git_functions import clone_all_apps, create_required_directories
 from script_helpers.app_functions import build_apps
+from script_helpers.ssl_functions import gen_certs
 import sys
 
 BUILD_APPS_FLAG = "-build"
@@ -22,14 +23,14 @@ def check_requirements():
     return match
 
 
-def run(build_apps=False):
+def run(should_build_apps=False):
 
     create_required_directories()
 
     print("\nCLONING APPS\n")
     clone_all_apps(APPS)
 
-    if build_apps:
+    if should_build_apps:
         requirements_met = check_requirements()
         if requirements_met:
             print("\nBUILDING APPS\n")
@@ -37,6 +38,9 @@ def run(build_apps=False):
         else:
             print("ERROR: Build flag was passed in, however not all requirements for building projects have been met.")
             exit(1)
+    
+    print("\nGENERATING CERTS\n")
+    gen_certs()
 
 def validate_args(args):
 
