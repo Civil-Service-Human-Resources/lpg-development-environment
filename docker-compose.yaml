@@ -48,6 +48,7 @@ services:
       - notification-service
     build:
       context: apps/identity-management
+      dockerfile: Dockerfile.dev
     ports:
       - 8081:8081
     command: java -jar /data/app.jar
@@ -79,9 +80,7 @@ services:
       - civil-servant-registry
       - identity
       - learning-catalogue
-      - mongodb
       - mysql
-      - learning-locker-xapi
     ports:
       - 9000:9000
       - 9010:9010
