@@ -96,9 +96,11 @@ services:
     depends_on:
       - identity
       - elasticsearch
+      - storage
     ports:
       - 9001:9001
       - 9091:9091
+    restart: always
 
   civil-servant-registry:
     # container_name: civil-servant-registry
@@ -147,11 +149,20 @@ services:
   # # Data
   elasticsearch:
     # container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.13
     ports:
       - 9200:9200
       - 9300:9300
-    command: 'elasticsearch -E cluster.name=local -E discovery.type=single-node'
+    command: 'elasticsearch'
+    env_file:
+      - ./env/elasticsearch.env
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.13
+    ports:
+      - 5601:5601
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
 
   redis:
     # container_name: redis
@@ -170,6 +181,13 @@ services:
     command: mysqld --init-file="/tmp/database/setup.sql"
     environment: 
       - MYSQL_ROOT_PASSWORD=my-secret-pw
+
+  storage:
+    image: mcr.microsoft.com/azure-storage/azurite
+    ports:
+      - 10000:10000
+      - 10001:10001
+      - 10002:10002
 
    #/Data
 
