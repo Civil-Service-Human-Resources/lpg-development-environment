@@ -149,7 +149,7 @@ services:
   # # Data
   elasticsearch:
     # container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.13
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.4.2
     ports:
       - 9200:9200
       - 9300:9300
@@ -158,7 +158,9 @@ services:
       - ./env/elasticsearch.env
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.17.13
+    image: docker.elastic.co/kibana/kibana:8.4.2
+    depends_on:
+      - elasticsearch
     ports:
       - 5601:5601
     environment:
