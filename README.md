@@ -85,6 +85,14 @@ Learning Locker will be set up as normal and should not be changed. It is extrem
 
 Redis and MySQL will start up in their own containers as dependencies for all of the other applications in the compose file. Once up, the MySQL container will bind volumes to the local machine to preserve data inbetween starting/stopping the dev-env.
 
+##### Populating the ElasticSearch (learning catalogue) database
+
+Use this command to add test courses to the ES database:
+
+```
+curl -XPOST "http://localhost:9200/courses/_doc/_bulk" -H "Content-Type: application/json" --data-binary "@apps/lpg-learning-catalogue/data/data.json"
+```
+
 ### After up
 
 Once all of the apps have successfully started within Docker, the website can be accessed by visiting `localhost:3001` in a web browser. 
